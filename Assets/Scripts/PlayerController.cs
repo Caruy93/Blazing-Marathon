@@ -7,18 +7,18 @@ public class PlayerController : MonoBehaviour
     // Initialize speed parameters
     public float forwardSpeed;
     public float sideSpeed;
-    public float dashDistance;
 
     // Input parameters
     private float horizontalInput;
     private float forwardInput;
+
     // Rigid body variable
     private Rigidbody playerRb;
-    private float push;
-    private float dash;
+    private float pushDirection;
+    public float pushPower = 1000f;
+    private float dashVelocity = 10f;
 
     private Vector3 moveVect = Vector3.zero;
-    public Vector3 dashVelocity;
 
     void Start()
     {
@@ -32,6 +32,7 @@ public class PlayerController : MonoBehaviour
         moveVect = Vector3.zero;
         forwardInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
+        // Using square root to transform input for a snappier accelaration
         if (horizontalInput > 0)
         {
             moveVect.x = Mathf.Sqrt(horizontalInput) * sideSpeed;
@@ -57,24 +58,36 @@ public class PlayerController : MonoBehaviour
             {
                 if (horizontalInput > 0)
                 {
-                    push = Mathf.Ceil(horizontalInput);
+                    pushDirection = Mathf.Ceil(horizontalInput);
                 } else
                 {
-                    push = Mathf.Floor(horizontalInput);
+                    pushDirection = Mathf.Floor(horizontalInput);
                 }
-                playerRb.AddForce(Vector3.right * 10 * push, ForceMode.VelocityChange);
+                playerRb.AddForce(Vector3.right * dashVelocity * pushDirection, ForceMode.Impulse);
             }
             // Otherwise, dash forward
             else
             {
-                playerRb.AddForce(Vector3.forward * 10, ForceMode.VelocityChange);
+                playerRb.AddForce(Vector3.forward * dashVelocity, ForceMode.VelocityChange);
             }
         }
        
     }
+
     private void FixedUpdate()
     {
         // Move player given inputs
         playerRb.MovePosition(transform.position + moveVect * Time.fixedDeltaTime);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Competitor"))
+        {
+            Rigidbody competitorRigidbody = collision.gameObject.GetComponent<Rigidbody>();
+            Vector3 awayFromPlayer = (collision.gameObject.transform.position - transform.position);
+
+            competitorRigidbody.AddForce(awayFromPlayer * pushPower, ForceMode.Impulse);
+        }
     }
 }
