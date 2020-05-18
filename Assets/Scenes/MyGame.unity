@@ -2132,7 +2132,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1471086968
 MonoBehaviour:
@@ -2147,9 +2147,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   curSpeed: 0
-  maxSpeed: 15
+  maxSpeed: 20
   accelaration: 1
   fallen: 0
+  standingUp: 0
 --- !u!1 &1527336553
 GameObject:
   m_ObjectHideFlags: 0
@@ -2514,9 +2515,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   curSpeed: 0
-  maxSpeed: 15
+  maxSpeed: 20
   accelaration: 1
   fallen: 0
+  standingUp: 0
 --- !u!54 &1848302286
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2531,7 +2533,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 80
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!136 &1848302287
 CapsuleCollider:
