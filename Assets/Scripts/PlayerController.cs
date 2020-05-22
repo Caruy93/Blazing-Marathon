@@ -20,9 +20,13 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 moveVect = Vector3.zero;
 
+    // Animator
+    private Animator playerAnim;
+
     void Start()
     {
-        playerRb = GetComponent<Rigidbody>();   
+        playerRb = GetComponent<Rigidbody>();
+        playerAnim = GetComponent<Animator>();
     }
 
     void Update()
@@ -32,6 +36,15 @@ public class PlayerController : MonoBehaviour
         moveVect = Vector3.zero;
         forwardInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
+
+        if (forwardInput > 0)
+        {
+            playerAnim.SetFloat("Speed_f", 1);
+        } else
+        {
+            playerAnim.SetFloat("Speed_f", 0);
+        }
+
         // Using square root to transform input for a snappier accelaration
         if (horizontalInput > 0)
         {
@@ -49,7 +62,6 @@ public class PlayerController : MonoBehaviour
             moveVect.z = Mathf.Sqrt(forwardInput * -1) * -forwardSpeed;
         }
 
-   
         // On pressing space, player dashes horiztonally, or forward to push
         if (Input.GetKeyDown(KeyCode.Space))
         {
@@ -80,6 +92,7 @@ public class PlayerController : MonoBehaviour
         playerRb.MovePosition(transform.position + moveVect * Time.fixedDeltaTime);
     }
 
+    // Pushes objects player contacts
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Competitor"))
