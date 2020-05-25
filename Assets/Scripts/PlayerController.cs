@@ -17,16 +17,19 @@ public class PlayerController : MonoBehaviour
     private float pushDirection;
     public float pushPower = 1000f;
     private float dashVelocity = 10f;
+    public float jumpForce = 10f;
 
     private Vector3 moveVect = Vector3.zero;
 
     // Animator
     private Animator playerAnim;
+    private bool onGround;
 
     void Start()
     {
         playerRb = GetComponent<Rigidbody>();
         playerAnim = GetComponent<Animator>();
+        onGround = true;
     }
 
     void Update()
@@ -63,27 +66,34 @@ public class PlayerController : MonoBehaviour
         }
 
         // On pressing space, player dashes horiztonally, or forward to push
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && onGround)
         {
-            // When player is adding sideways movement
-            if (horizontalInput != 0)
+            playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            playerAnim.SetBool("Jump_b", true);
+            onGround = false;
+        }
+
+        /* Dash code
+        // When player is adding sideways movement
+        if (horizontalInput != 0)
+        {
+            if (horizontalInput > 0)
             {
-                if (horizontalInput > 0)
-                {
-                    pushDirection = Mathf.Ceil(horizontalInput);
-                } else
-                {
-                    pushDirection = Mathf.Floor(horizontalInput);
-                }
-                playerRb.AddForce(Vector3.right * dashVelocity * pushDirection, ForceMode.Impulse);
+                pushDirection = Mathf.Ceil(horizontalInput);
             }
-            // Otherwise, dash forward
             else
             {
-                playerRb.AddForce(Vector3.forward * dashVelocity, ForceMode.VelocityChange);
+                pushDirection = Mathf.Floor(horizontalInput);
             }
+            playerRb.AddForce(Vector3.right * dashVelocity * pushDirection, ForceMode.Impulse);
         }
-       
+        // Otherwise, dash forward
+        else
+        {
+            playerRb.AddForce(Vector3.forward * dashVelocity, ForceMode.VelocityChange);
+        }
+        */
+
     }
 
     private void FixedUpdate()
@@ -101,6 +111,12 @@ public class PlayerController : MonoBehaviour
             Vector3 awayFromPlayer = (collision.gameObject.transform.position - transform.position);
 
             competitorRigidbody.AddForce(awayFromPlayer * pushPower, ForceMode.Impulse);
+        }
+
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            onGround = true;
+            playerAnim.SetBool("Jump_b", false);
         }
     }
 }
