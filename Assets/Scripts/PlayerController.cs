@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header("Player Stats")]
+
     // Initialize speed parameters
     public float forwardSpeed;
     public float sideSpeed;
@@ -15,9 +17,9 @@ public class PlayerController : MonoBehaviour
     // Rigid body variable
     private Rigidbody playerRb;
     private float pushDirection;
-    public float pushPower = 1000f;
+    [SerializeField] float pushPower = 1000f;
     private float dashVelocity = 10f;
-    public float jumpForce = 10f;
+    [SerializeField] float jumpForce = 10f;
 
     private Vector3 moveVect = Vector3.zero;
 
@@ -35,11 +37,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
 
-        // Movement inputs
-        moveVect = Vector3.zero;
-        forwardInput = Input.GetAxis("Vertical");
-        horizontalInput = Input.GetAxis("Horizontal");
-
+        // Trigger player runnign animation
         if (forwardInput > 0)
         {
             playerAnim.SetFloat("Speed_f", 1);
@@ -47,29 +45,16 @@ public class PlayerController : MonoBehaviour
         {
             playerAnim.SetFloat("Speed_f", 0);
         }
+        Debug.Log(playerAnim.GetFloat("Speed_f"));
 
-        // Using square root to transform input for a snappier accelaration
-        if (horizontalInput > 0)
-        {
-            moveVect.x = Mathf.Sqrt(horizontalInput) * sideSpeed;
-        } else if (horizontalInput < 0)
-        {
-            moveVect.x = Mathf.Sqrt(horizontalInput * -1) * -sideSpeed;
-        }
-
-        if (forwardInput > 0)
-        {
-            moveVect.z = Mathf.Sqrt(forwardInput) * forwardSpeed;
-        } else if (forwardInput < 0)
-        {
-            moveVect.z = Mathf.Sqrt(forwardInput * -1) * -forwardSpeed;
-        }
+       
 
         // On pressing space, player dashes horiztonally, or forward to push
         if (Input.GetKeyDown(KeyCode.Space) && onGround)
         {
             playerRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
             playerAnim.SetBool("Jump_b", true);
+
             onGround = false;
         }
 
@@ -98,8 +83,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // Move player given inputs
-        playerRb.MovePosition(transform.position + moveVect * Time.fixedDeltaTime);
+        Move();
+
+
     }
 
     // Pushes objects player contacts
@@ -117,6 +103,36 @@ public class PlayerController : MonoBehaviour
         {
             onGround = true;
             playerAnim.SetBool("Jump_b", false);
+
         }
+    }
+
+    private void Move()
+    {
+        // Movement inputs
+        moveVect = Vector3.zero;
+        forwardInput = Input.GetAxisRaw("Vertical");
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+
+        // Using square root to transform input for a snappier accelaration
+        if (horizontalInput > 0)
+        {
+            moveVect.x = Mathf.Sqrt(horizontalInput) * sideSpeed;
+        }
+        else if (horizontalInput < 0)
+        {
+            moveVect.x = Mathf.Sqrt(horizontalInput * -1) * -sideSpeed;
+        }
+
+        if (forwardInput > 0)
+        {
+            moveVect.z = Mathf.Sqrt(forwardInput) * forwardSpeed;
+        }
+        else if (forwardInput < 0)
+        {
+            moveVect.z = Mathf.Sqrt(forwardInput * -1) * -forwardSpeed;
+        }
+        // Move player given inputs
+        playerRb.MovePosition(transform.position + moveVect * Time.fixedDeltaTime);
     }
 }
